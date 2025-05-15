@@ -42,9 +42,20 @@ class BackgroundRemoverRembgApp:
             self.set_status("Image chargée. Cliquez pour traiter.")
 
     def display_image(self, image):
-        image_resized = image.resize((400, 400))
+        max_size = 400
+        width, height = image.size
+
+        # Calcul des dimensions avec conservation du ratio
+        ratio = min(max_size / width, max_size / height)
+        new_width = int(width * ratio)
+        new_height = int(height * ratio)
+
+        image_resized = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
         self.tk_image = ImageTk.PhotoImage(image_resized)
         self.image_label.config(image=self.tk_image)
+        self.image_label.image = self.tk_image  # pour éviter le garbage collection
+
 
     def start_background_removal(self):
         self.set_status("Traitement de l'image en cours...")
